@@ -1,8 +1,4 @@
-from datetime import datetime
-
-import discord
 from discord.ext import commands
-
 from bot import log
 from config import PREFIX, WATCHED_SERVERS
 
@@ -53,6 +49,16 @@ class Events(commands.Cog):
             else:
                 channel = f"{after.guild.name} | #{after.channel.name} | {after.author}"
             log("Message Edited", log_message, channel)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if self.client.user in message.mentions:
+            log_message = message.content.replace(f"<@!{self.client.user.id}>", f"@{self.client.user.name}")
+            if message.guild is not None:
+                channel = f"{message.guild.name} | #{message.channel.name} | {message.author}"
+            else:
+                channel = f"DM: {message.channel.recipient} | {message.author}"
+            log("You got mentioned", log_message, channel)
 
 
 def setup(client):
