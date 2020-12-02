@@ -29,7 +29,7 @@ class Events(commands.Cog):
         guild = payload.guild_id
         channel_id = payload.channel_id
         message = payload.cached_message
-        if message.content.startswith(PREFIX):
+        if message.content is not None and message.author == self.client.user:
             return
         if guild is not None or guild in WATCHED_SERVERS:
             channel_name = await self.client.fetch_channel(channel_id)
@@ -47,7 +47,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        if message.content is not None and (message.guild is None or int(message.guild.id) in WATCHED_SERVERS):
+        if message.content is not None and message.author != self.client.user:
             channel = str(message.channel.recipient.id) if message.guild is None else str(message.channel.id)
             with open("message_sniper.json", "r+") as f:
                 try:
@@ -74,7 +74,7 @@ class Events(commands.Cog):
     async def on_message_edit(self, before, after):
         old_message = before.content
         new_message = after.content
-        if old_message == new_message:
+        if old_message == new_message or after.author == self.client.user:
             return
         if after.guild is None or int(after.guild.id) in WATCHED_SERVERS:
             log_message = f"{old_message} => {new_message}"
@@ -83,26 +83,26 @@ class Events(commands.Cog):
             else:
                 channel = f"{after.guild.name} | #{after.channel.name} | {after.author}"
             log("Message Edited", log_message, channel)
-            channel = str(after.channel.recipient.id) if after.guild is None else str(after.channel.id)
-            with open("message_sniper.json", "r+") as f:
-                data = json.load(f)
-                try:
-                    data["edited_messages"][channel] = {
-                        "author": str(after.author.id),
-                        "old_message": before.content,
-                        "new_message": after.content,
-                        "time": datetime.now().strftime('%H:%M')
-                    }
-                except KeyError:
-                    data["edited_messages"] = {}
-                    data["edited_messages"][channel] = {
-                        "author": str(after.author.id),
-                        "old_message": before.content,
-                        "new_message": after.content,
-                        "time": datetime.now().strftime('%H:%M')
-                    }
-            with open("message_sniper.json", "w+") as f:
-                json.dump(data, f, indent=4)
+        channel = str(after.channel.recipient.id) if after.guild is None else str(after.channel.id)
+        with open("message_sniper.json", "r+") as f:
+            data = json.load(f)
+            try:
+                data["edited_messages"][channel] = {
+                    "author": str(after.author.id),
+                    "old_message": before.content,
+                    "new_message": after.content,
+                    "time": datetime.now().strftime('%H:%M')
+                }
+            except KeyError:
+                data["edited_messages"] = {}
+                data["edited_messages"][channel] = {
+                    "author": str(after.author.id),
+                    "old_message": before.content,
+                    "new_message": after.content,
+                    "time": datetime.now().strftime('%H:%M')
+                }
+        with open("message_sniper.json", "w+") as f:
+            json.dump(data, f, indent=4)
 
     @commands.Cog.listener()
     async def on_message(self, message):

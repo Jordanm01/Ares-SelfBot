@@ -28,7 +28,7 @@ class MessageSnipe(commands.Cog):
             emb.description = sniped_message["message"]
             emb.set_author(name=f"{author.name}#{author.discriminator}", icon_url=author.avatar_url)
             emb.set_footer(text=f"Deleted at {sniped_message['time']}")
-            await ctx.send(embed=emb)
+            await ctx.send(embed=emb, delete_after=10)
 
     @commands.command(aliases=['esnipe'])
     async def edit_snipe(self, ctx, channel: discord.TextChannel = None):
@@ -51,7 +51,7 @@ class MessageSnipe(commands.Cog):
                               f"**After**: {sniped_message['new_message']}"
             emb.set_author(name=f"{author.name}#{author.discriminator}", icon_url=author.avatar_url)
             emb.set_footer(text=f"Edited at {sniped_message['time']}")
-            await ctx.send(embed=emb)
+            await ctx.send(embed=emb, delete_after=10)
 
 def setup(client):
     client.add_cog(MessageSnipe(client))
