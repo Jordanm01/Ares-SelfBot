@@ -14,20 +14,26 @@ def cog_loader():
         if filename.endswith('.py'):
             client.load_extension(f'cogs.{filename[:-3]}')
 
-
 def draw_ui():
     custom_fig = Figlet(font='basic')
-    print(f"\033[1;34m=============================================================================\n\n\n"
-          f"\033[1;36m{custom_fig.renderText('* SelfBot *')}"
-          f"\033[1;34m=============================================================================\n\033"
-          f"[0;0m\n")
+    ares = False
+    if ares:
+        print(f"\033[1;34m===================================================\n\n\n"
+              f"\033[1;36m{custom_fig.renderText('* Ares *')}"
+              f"\033[1;34m===================================================\n\033"
+              f"[0;0m\n")
+    else:
+        print(f"\033[1;34m=============================================================================\n\n\n"
+              f"\033[1;36m{custom_fig.renderText('* SelfBot *')}"
+              f"\033[1;34m=============================================================================\n\033"
+              f"[0;0m\n")
 
-def log(event, message, extra_info=""):
+def log(event, message, extra_info=None):
     time = datetime.now().strftime('%H:%M')
     print(f"\033[1;34m[\033[1;36m{time}\033[1;34m] "
           f"\033[1;36m{event}: "
-          f"{message} "
-          f"\033[1;34m[\033[1;36m{extra_info}\033[1;34m]\033[0m")
+          f"{message} " +
+          (f"\033[1;34m[\033[1;36m{extra_info}\033[1;34m]\033[0m" if extra_info is not None else ""))
 
 
 if __name__ == "__main__":
