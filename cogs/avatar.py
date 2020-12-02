@@ -1,5 +1,7 @@
 import io
 import discord
+import requests
+from discord import HTTPException
 from discord.ext import commands
 
 from config import PASSWORD
@@ -26,6 +28,16 @@ class Avatar(commands.Cog):
             await self.client.user.edit(avatar=img_bytes, password=PASSWORD)
         except ValueError:
             await ctx.send("The colours you specified were not valid!")
+
+    @commands.command()
+    async def stealavatar(self, ctx, user: discord.Member = None):
+        if user is not None:
+            img = requests.get(user.avatar_url).content
+            try:
+                await self.client.user.edit(avatar=img, password=PASSWORD)
+                await ctx.send(content=f"New Avatar:\n{user.avatar_url}")
+            except HTTPException:
+                await ctx.send("You're ratelimited!", delete_after=5)
 
 def setup(client):
     client.add_cog(Avatar(client))
