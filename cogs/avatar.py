@@ -37,7 +37,7 @@ class Avatar(commands.Cog):
                 await self.client.user.edit(avatar=img, password=PASSWORD)
                 await ctx.send(content=f"New Avatar:\n{user.avatar_url}")
             except HTTPException:
-                await ctx.send("You're ratelimited!", delete_after=5)
+                await ctx.send("You're rate-limited!", delete_after=5)
 
 def setup(client):
     client.add_cog(Avatar(client))
