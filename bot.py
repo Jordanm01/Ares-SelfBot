@@ -16,7 +16,7 @@ def cog_loader():
 
 def draw_ui():
     custom_fig = Figlet(font='basic')
-    ares = False
+    ares = True
     if ares:
         print(f"\033[1;34m===================================================\n\n\n"
               f"\033[1;36m{custom_fig.renderText('* Ares *')}"
