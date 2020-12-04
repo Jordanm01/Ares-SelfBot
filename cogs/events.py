@@ -4,7 +4,7 @@ from json import JSONDecodeError
 
 from discord.ext import commands
 from bot import log
-from config import PREFIX, WATCHED_SERVERS
+from config import PREFIX, WATCHED_SERVERS, LOGGING
 
 
 class Events(commands.Cog):
@@ -25,28 +25,9 @@ class Events(commands.Cog):
         log("Server Left", guild.name)
 
     @commands.Cog.listener()
-    async def on_raw_message_delete(self, payload):
-        guild = payload.guild_id
-        channel_id = payload.channel_id
-        message = payload.cached_message
-        if message.content is not None and message.author == self.client.user:
-            return
-        if guild is not None or guild in WATCHED_SERVERS:
-            channel_name = await self.client.fetch_channel(channel_id)
-            if guild is not None:
-                channel = f"{(await self.client.fetch_guild(guild)).name} | #{channel_name.name}"
-            else:
-                channel = f"DM" + f": {channel_name.recipient}" if channel_name.recipient is not None else ""
-
-            if message is None:
-                log_message = f"Couldn't fetch message!"
-            else:
-                log_message = f"'{message.content}'"
-                channel = f"{channel} | @{message.author}"
-            log("Message Deleted", log_message, channel)
-
-    @commands.Cog.listener()
     async def on_message_delete(self, message):
+        if not LOGGING:
+            return
         if message.content is not None and message.author != self.client.user:
             channel = str(message.channel.recipient.id) if message.guild is None else str(message.channel.id)
             with open("message_sniper.json", "r+") as f:
@@ -69,9 +50,15 @@ class Events(commands.Cog):
                     }
             with open("message_sniper.json", "w+") as f:
                 json.dump(data, f, indent=4)
+            if message.guild is None or int(message.guild.id) in WATCHED_SERVERS:
+                channel = f"G: {message.guild.name} | #{message.channel.name}" if message.guild is not None else \
+                    f"DM: {message.channel.recipient}"
+                log("Message Deleted", message.content, channel)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
+        if not LOGGING:
+            return
         old_message = before.content
         new_message = after.content
         if old_message == new_message or after.author == self.client.user:
@@ -106,6 +93,8 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if not LOGGING:
+            return
         if self.client.user in message.mentions:
             log_message = message.content.replace(f"<@!{self.client.user.id}>", f"@{self.client.user.name}")
             if message.guild is not None:
