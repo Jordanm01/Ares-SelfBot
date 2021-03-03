@@ -1,7 +1,7 @@
 import io
-
-from PIL import Image, ImageColor
 import numpy as np
+from PIL import Image, ImageColor
+
 
 async def generate_pfp(colour, template_colour):
     disc_template = Image.open('images/discord_logo.png')

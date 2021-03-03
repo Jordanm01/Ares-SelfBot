@@ -6,13 +6,19 @@ from pyfiglet import Figlet
 
 start_time = datetime.now().strftime('%d/%m/%Y | %H:%M')
 client = commands.Bot(command_prefix=PREFIX, self_bot=True, case_insensitive=True)
-# client.remove_command("help")
+client.remove_command("help")
+
+
+@client.event
+async def on_ready():
+    await client.change_presence(afk=True)
 
 
 def cog_loader():
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
             client.load_extension(f'cogs.{filename[:-3]}')
+
 
 def draw_ui():
     custom_fig = Figlet(font='basic')
@@ -27,6 +33,7 @@ def draw_ui():
               f"\033[1;36m{custom_fig.renderText('* SelfBot *')}"
               f"\033[1;34m=============================================================================\n\033"
               f"[0;0m\n")
+
 
 def log(event, message, extra_info=None):
     time = datetime.now().strftime('%H:%M')

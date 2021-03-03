@@ -51,15 +51,16 @@ class Sniper(commands.Cog):
                                     }]
                                 }
                                 await client.post(NOTIFICATION_WEBHOOK, json=data)
-                            except:
-                                pass
+                            except Exception as e:
+                                log("Error!", e)
                     elif "This gift has been redeemed already." in response:
                         discord_response = "Code Already Redeemed"
                     else:
                         discord_response = f"Unknown Response: {response}"
                 log(f"Nitro Sniper [%.3fs]" % delay, f"{discord_response} ({code})", f"{message.guild.name} | "
-                                                                                    f"#{message.channel.name} | "
-                                                                                    f"{message.author}")
+                                                                                     f"#{message.channel.name} | "
+                                                                                     f"{message.author}")
+
 
 def setup(client):
     client.add_cog(Sniper(client))
